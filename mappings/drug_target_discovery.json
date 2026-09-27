@@ -1,0 +1,130 @@
+{
+  "domain": "drug_target_discovery",
+  "version": "1.0.0",
+  "verify_bijection": true,
+  "mappings": [
+    {
+      "action": "a_search_disease",
+      "server": "opentargets-server",
+      "tool": "search_diseases",
+      "parameter_mapping": {
+        "0": "query",
+        "1": "size"
+      },
+      "output_extractors": {
+        "disease_id": "data.search.hits[0].id",
+        "disease_name": "data.search.hits[0].name"
+      }
+    },
+    {
+      "action": "a_get_disease_targets",
+      "server": "opentargets-server",
+      "tool": "get_disease_targets_summary",
+      "parameter_mapping": {
+        "0": "diseaseId",
+        "1": "size"
+      },
+      "output_extractors": {
+        "first_gene": "topTargets[0].targetSymbol"
+      }
+    },
+    {
+      "action": "a_get_protein_by_gene",
+      "server": "uniprot-server",
+      "tool": "search_by_gene",
+      "parameter_mapping": {
+        "0": "gene"
+      },
+      "output_extractors": {
+        "uniprot_accession": "results[0].primaryAccession",
+        "protein_name": "results[0].proteinDescription.recommendedName.fullName.value"
+      }
+    },
+    {
+      "action": "a_get_protein_info",
+      "server": "uniprot-server",
+      "tool": "get_protein_info",
+      "parameter_mapping": {
+        "0": "accession",
+        "1": "format"
+      },
+      "output_extractors": {
+        "protein_sequence": "sequence.value"
+      }
+    },
+    {
+      "action": "a_find_pathways_by_gene",
+      "server": "reactome-server",
+      "tool": "find_pathways_by_gene",
+      "parameter_mapping": {
+        "0": "gene"
+      },
+      "output_extractors": {
+        "first_pathway": "pathways[0].id"
+      }
+    },
+    {
+      "action": "a_get_kegg_pathway",
+      "server": "kegg-server",
+      "tool": "get_pathway_info",
+      "parameter_mapping": {
+        "0": "pathway_id"
+      },
+      "output_extractors": {
+        "pathway_name": "name",
+        "pathway_genes": "gene"
+      }
+    },
+    {
+      "action": "a_get_pdb_structures",
+      "server": "pdb-server",
+      "tool": "search_by_uniprot",
+      "parameter_mapping": {
+        "0": "uniprot_id",
+        "1": "limit"
+      },
+      "output_extractors": {
+        "first_pdb": "result_set[0].identifier"
+      }
+    },
+    {
+      "action": "a_get_alphafold_structure",
+      "server": "alphafold-server",
+      "tool": "get_structure",
+      "parameter_mapping": {
+        "0": "uniprotId",
+        "1": "format"
+      },
+      "output_extractors": {
+        "alphafold_model": "pdbUrl"
+      }
+    },
+    {
+      "action": "a_get_compounds_for_target",
+      "server": "chembl-server",
+      "tool": "search_by_uniprot",
+      "parameter_mapping": {
+        "0": "uniprot_id",
+        "1": "limit"
+      },
+      "output_extractors": {
+        "chembl_target_id": "targets[0].target_chembl_id",
+        "target_name": "targets[0].pref_name"
+      }
+    },
+    {
+      "action": "a_search_literature",
+      "server": "pubmed-server",
+      "tool": "search_articles",
+      "parameter_mapping": {
+        "0": "query",
+        "1": "max_results"
+      },
+      "output_extractors": {
+        "pmids": "pmids",
+        "article_count": "totalResults"
+      }
+    }
+  ]
+}
+

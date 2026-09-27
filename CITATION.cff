@@ -1,0 +1,81 @@
+cff-version: 1.2.0
+message: >-
+  If you use this artifact, please cite both the paper and the archived
+  release.
+title: >-
+  HTN Planning as a Coordination Layer for Multi-Server MCP Tool
+  Orchestration — Artifact: GTPyhop planning, JSON binding, and a
+  cross-server MCP orchestration middleware
+abstract: >-
+  Research artifact for the HPlan workshop paper "HTN Planning as a
+  Coordination Layer for Multi-Server MCP Tool Orchestration" (ICAPS 2026,
+  Dublin). Reproduces the planning layer for the paper's five HTN domains,
+  the planner -> JSON binding -> orchestration middleware pipeline offline
+  with no database, and the live drug-target-discovery run against the eight
+  Augmented Nature MCP servers, together with the original log of the three
+  live runs reported in the paper.
+type: software
+license: Apache-2.0
+# NOTE: CFF permits one licence field. The repository is mixed-licence --
+# Apache-2.0 for code, mappings and scripts; CC-BY-4.0 for evidence/.
+# See LICENSES.md, which governs.
+
+authors:
+  - family-names: Jacopin
+    given-names: Eliott
+    affiliation: RIKEN
+    email: eliott.jacopin@riken.jp
+    # orcid: 'https://orcid.org/TODO'
+  - family-names: Jacopin
+    given-names: Eric
+    affiliation: Cosmic AI
+    email: eric.jacopin@protonmail.com
+    # orcid: 'https://orcid.org/TODO'
+  - family-names: Takahashi
+    given-names: Koichi
+    affiliation: RIKEN
+    email: koichi.takahashi@riken.jp
+    # orcid: 'https://orcid.org/TODO'
+
+# TODO: Zenodo concept DOI.
+repository-code: 'https://github.com/PCfVW/hplan26-artifact'
+url: 'https://github.com/PCfVW/hplan26-artifact'
+# doi: '10.5281/zenodo.TODO'   # concept DOI: always the latest version
+
+keywords:
+  - HTN planning
+  - hierarchical task networks
+  - GTPyhop
+  - Model Context Protocol
+  - MCP
+  - tool orchestration
+  - coordination layer
+  - reproducibility
+  - drug-target discovery
+  - laboratory automation
+
+preferred-citation:
+  type: conference-paper
+  title: >-
+    HTN Planning as a Coordination Layer for Multi-Server MCP Tool
+    Orchestration
+  authors:
+    - family-names: Jacopin
+      given-names: Eliott
+      affiliation: RIKEN
+    - family-names: Jacopin
+      given-names: Eric
+      affiliation: Cosmic AI
+    - family-names: Takahashi
+      given-names: Koichi
+      affiliation: RIKEN
+  collection-title: >-
+    Workshop on Hierarchical Planning (HPlan), ICAPS 2026 (non-archival)
+  conference:
+    name: >-
+      Workshop on Hierarchical Planning (HPlan) at the International
+      Conference on Automated Planning and Scheduling (ICAPS 2026)
+    city: Dublin
+    country: IE
+  year: 2026
+  # url: 'https://arxiv.org/abs/TODO'

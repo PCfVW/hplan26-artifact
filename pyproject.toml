@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hplan-orchestrator"
+version = "1.0.0"
+description = "Artifact for 'HTN Planning as a Coordination Layer for Multi-Server MCP Tool Orchestration' (HPlan @ ICAPS 2026): GTPyhop planning, JSON binding, and cross-server MCP orchestration middleware"
+readme = "README.md"
+license = { text = "Apache-2.0 (see LICENSES.md)" }
+authors = [
+    { name = "Eliott Jacopin", email = "eliott.jacopin@riken.jp" },
+    { name = "Eric Jacopin", email = "eric.jacopin@protonmail.com" },
+    { name = "Koichi Takahashi", email = "koichi.takahashi@riken.jp" },
+]
+requires-python = ">=3.10"
+dependencies = [
+    "gtpyhop>=2.0.1,<3",     # meta-package; pulls gtpyhop-core and gtpyhop-examples at the same version
+    "pydantic>=2,<3",
+    "jsonschema>=4",
+]
+
+[project.optional-dependencies]
+live = ["mcp>=1.18.0,<2"]
+test = ["pytest>=8", "pytest-asyncio>=0.21"]
+
+[tool.setuptools.packages.find]
+where = ["orchestrator/src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --strict-markers"
+testpaths = ["orchestrator/tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.setuptools.package-data]
+hplan_orchestrator = ["data/*.json"]

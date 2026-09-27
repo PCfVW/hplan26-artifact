@@ -1,0 +1,61 @@
+{
+  "_comment": "Launch configuration for the eight Augmented Nature MCP servers (from mcp-python-ingestion examples/orchestration_demo/drug_target_discovery/mcp_client_config.json). ${SERVERS_ROOT} is replaced by --servers-root, $HPLAN_MCP_SERVERS_ROOT, or ~/mcp-servers.",
+  "mcpServers": {
+    "opentargets-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/OpenTargets-MCP-Server/build/index.js"
+      ],
+      "description": "Open Targets platform for disease-target associations"
+    },
+    "uniprot-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/UniProt-MCP-Server/build/index.js"
+      ],
+      "description": "UniProt protein database for sequence and function data"
+    },
+    "reactome-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/Reactome-MCP-Server/build/index.js"
+      ],
+      "description": "Reactome pathway database for biological pathways"
+    },
+    "pdb-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/PDB-MCP-Server/build/index.js"
+      ],
+      "description": "Protein Data Bank for experimental 3D structures"
+    },
+    "alphafold-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/AlphaFold-MCP-Server/build/index.js"
+      ],
+      "description": "AlphaFold predicted protein structures"
+    },
+    "chembl-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/ChEMBL-MCP-Server/build/index.js"
+      ],
+      "description": "ChEMBL database for drug compounds and bioactivity"
+    },
+    "pubmed-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/PubMed-MCP-Server/build/index.js"
+      ],
+      "description": "PubMed literature database for scientific publications"
+    },
+    "kegg-server": {
+      "command": "node",
+      "args": [
+        "${SERVERS_ROOT}/KEGG-MCP-Server/build/index.js"
+      ],
+      "description": "KEGG pathway database for metabolic and signaling pathways"
+    }
+  }
+}

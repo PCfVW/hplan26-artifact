@@ -1,0 +1,81 @@
+# Excerpt of the backend log of the three live runs reported in the paper (Table 2).
+# Source: api_server.log of the private backend, lines 11-84 of 84 (lines 1-10 are the
+# server start banner: host 127.0.0.1, port 8000, log level). Only change: client-side
+# ephemeral ports replaced by <port>. Log lines carry no date; the file was created
+# 2025-12-13 19:24 and last written 2025-12-13 20:09:06 (CET), i.e. the runs took place
+# on 2025-12-13. The plan key records when the plan was stored (2025-12-10 16:14:47).
+#
+Imported GTPyhop version 1.6.0
+Messages from find_plan will be prefixed with 'FP>'.
+Messages from run_lazy_lookahead will be prefixed with 'RLL>'.
+Using session-based architecture with structured logging.
+INFO:     Started server process [51128]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Open Targets MCP server running on stdio
+20:05:29 | drug-target-discovery-demo | INFO | [OK] Connected to opentargets-server
+20:05:29 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to opentargets-server
+UniProt MCP server running on stdio
+20:05:29 | drug-target-discovery-demo | INFO | [OK] Connected to uniprot-server
+20:05:29 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to uniprot-server
+Reactome MCP server running on stdio
+20:05:29 | drug-target-discovery-demo | INFO | [OK] Connected to reactome-server
+20:05:29 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to reactome-server
+KEGG MCP server running on stdio
+20:05:29 | drug-target-discovery-demo | INFO | [OK] Connected to kegg-server
+20:05:29 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to kegg-server
+PDB MCP server running on stdio
+20:05:30 | drug-target-discovery-demo | INFO | [OK] Connected to pdb-server
+20:05:30 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to pdb-server
+AlphaFold MCP server running on stdio
+20:05:30 | drug-target-discovery-demo | INFO | [OK] Connected to alphafold-server
+20:05:30 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to alphafold-server
+ChEMBL MCP server running on stdio
+20:05:30 | drug-target-discovery-demo | INFO | [OK] Connected to chembl-server
+20:05:30 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to chembl-server
+PubMed MCP Server running on stdio
+20:05:30 | drug-target-discovery-demo | INFO | [OK] Connected to pubmed-server
+20:05:30 | mcp_python_ingestion.api.middleware_manager | INFO | [Real] Connected to pubmed-server
+INFO:     127.0.0.1:<port> - "POST /api/execute/start HTTP/1.1" 200 OK
+20:05:30 | mcp_python_ingestion.api.executor | INFO | Executing plan plan_20251210_161447_scenario_1_breast_ca with parameters: {}
+20:05:31 | mcp_python_ingestion.orchestration.middleware | INFO | Execution plan detected, starting orchestration
+20:05:31 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 1: search_diseases on opentargets-server
+20:05:31 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 2: get_disease_targets_summary on opentargets-server
+20:05:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 3: search_by_gene on uniprot-server
+20:05:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 4: find_pathways_by_gene on reactome-server
+20:05:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 5: search_by_uniprot on pdb-server
+20:05:34 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 6: get_structure on alphafold-server
+20:05:34 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 7: search_by_uniprot on chembl-server
+20:06:04 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 8: search_articles on pubmed-server
+20:06:05 | mcp_python_ingestion.api.executor | INFO | Execution completed: 8 steps
+INFO:     127.0.0.1:<port> - "GET /api/execute/status/8669ffa5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:<port> - "OPTIONS /api/execute/start HTTP/1.1" 200 OK
+20:07:32 | mcp_python_ingestion.api.routers.execution | INFO | Starting REAL MCP execution for plan plan_20251210_161447_scenario_1_breast_ca
+INFO:     127.0.0.1:<port> - "POST /api/execute/start HTTP/1.1" 200 OK
+20:07:32 | mcp_python_ingestion.api.executor | INFO | Executing plan plan_20251210_161447_scenario_1_breast_ca with parameters: {}
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Execution plan detected, starting orchestration
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 1: search_diseases on opentargets-server
+INFO:     127.0.0.1:<port> - "GET /api/execute/stream/a4bfa271 HTTP/1.1" 200 OK
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 2: get_disease_targets_summary on opentargets-server
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 3: search_by_gene on uniprot-server
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 4: find_pathways_by_gene on reactome-server
+20:07:33 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 5: search_by_uniprot on pdb-server
+20:07:34 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 6: get_structure on alphafold-server
+20:07:34 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 7: search_by_uniprot on chembl-server
+20:08:01 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 8: search_articles on pubmed-server
+20:08:02 | mcp_python_ingestion.api.executor | INFO | Execution completed: 8 steps
+20:08:50 | mcp_python_ingestion.api.routers.execution | INFO | Starting REAL MCP execution for plan plan_20251210_161447_scenario_1_breast_ca
+INFO:     127.0.0.1:<port> - "POST /api/execute/start HTTP/1.1" 200 OK
+20:08:50 | mcp_python_ingestion.api.executor | INFO | Executing plan plan_20251210_161447_scenario_1_breast_ca with parameters: {}
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Execution plan detected, starting orchestration
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 1: search_diseases on opentargets-server
+INFO:     127.0.0.1:<port> - "GET /api/execute/stream/c4221b97 HTTP/1.1" 200 OK
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 2: get_disease_targets_summary on opentargets-server
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 3: search_by_gene on uniprot-server
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 4: find_pathways_by_gene on reactome-server
+20:08:51 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 5: search_by_uniprot on pdb-server
+20:08:52 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 6: get_structure on alphafold-server
+20:08:52 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 7: search_by_uniprot on chembl-server
+20:09:05 | mcp_python_ingestion.orchestration.middleware | INFO | Executing step 8: search_articles on pubmed-server
+20:09:06 | mcp_python_ingestion.api.executor | INFO | Execution completed: 8 steps

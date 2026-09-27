@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv*/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MCP servers cloned by servers/setup_servers.* (never vendored)
+node_modules/
+mcp-servers/
+
+# Local environment and editor files
+.env
+.idea/
+.vscode/
+*.swp
+.DS_Store

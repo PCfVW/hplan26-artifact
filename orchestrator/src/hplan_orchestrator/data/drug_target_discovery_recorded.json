@@ -1,0 +1,243 @@
+{
+ "_comment": "Recorded responses of the eight-step drug_target_discovery plan (scenario 1, breast cancer), captured with scripts/run_live.py on 2026-09-27 and trimmed to the first few items of each list. Keys are '<server>/<tool>'. Values are the parsed JSON payloads the servers returned, i.e. what RealMCPClient puts under 'data'. The AlphaFold entry is the server's actual error text (AlphaFold DB has no model for P51587) and the ChEMBL entry is its actual empty result.",
+ "responses": {
+  "opentargets-server/search_diseases": {
+   "data": {
+    "search": {
+     "total": 25,
+     "hits": [
+      {
+       "id": "MONDO_0007254",
+       "name": "breast cancer",
+       "description": "A primary or metastatic malignant neoplasm involving the breast. The vast majority of cases are carcinomas arising from the breast parenchyma or the nipple. Malignant breast neoplasms occur more frequently in females than in males.",
+       "entity": "disease"
+      },
+      {
+       "id": "MONDO_0004989",
+       "name": "breast carcinoma",
+       "description": "A carcinoma that arises from epithelial cells of the breast",
+       "entity": "disease"
+      }
+     ]
+    }
+   }
+  },
+  "opentargets-server/get_disease_targets_summary": {
+   "diseaseId": "MONDO_0007254",
+   "diseaseName": "breast cancer",
+   "totalTargets": 17252,
+   "topTargets": [
+    {
+     "targetId": "ENSG00000139618",
+     "targetSymbol": "BRCA2",
+     "targetName": "BRCA2 DNA repair associated",
+     "associationScore": 0.9251085451993997
+    },
+    {
+     "targetId": "ENSG00000012048",
+     "targetSymbol": "BRCA1",
+     "targetName": "BRCA1 DNA repair associated",
+     "associationScore": 0.9194443258299257
+    },
+    {
+     "targetId": "ENSG00000183765",
+     "targetSymbol": "CHEK2",
+     "targetName": "checkpoint kinase 2",
+     "associationScore": 0.883711182935059
+    }
+   ]
+  },
+  "uniprot-server/search_by_gene": {
+   "results": [
+    {
+     "primaryAccession": "P51587",
+     "uniProtkbId": "BRCA2_HUMAN",
+     "organism": {
+      "scientificName": "Homo sapiens",
+      "commonName": "Human",
+      "taxonId": 9606,
+      "lineage": [
+       "Eukaryota",
+       "Metazoa",
+       "Chordata",
+       "Craniata",
+       "Vertebrata",
+       "Euteleostomi",
+       "Mammalia",
+       "Eutheria",
+       "Euarchontoglires",
+       "Primates",
+       "Haplorrhini",
+       "Catarrhini",
+       "Hominidae",
+       "Homo"
+      ]
+     },
+     "proteinDescription": {
+      "recommendedName": {
+       "fullName": {
+        "evidences": [
+         {
+          "evidenceCode": "ECO:0000303",
+          "source": "PubMed",
+          "id": "8524414"
+         }
+        ],
+        "value": "Breast cancer type 2 susceptibility protein"
+       }
+      },
+      "alternativeNames": [
+       {
+        "fullName": {
+         "evidences": [
+          {
+           "evidenceCode": "ECO:0000303",
+           "source": "PubMed",
+           "id": "15199141"
+          }
+         ],
+         "value": "Fanconi anemia group D1 protein"
+        }
+       }
+      ]
+     },
+     "genes": [
+      {
+       "geneName": {
+        "evidences": [
+         {
+          "evidenceCode": "ECO:0000303",
+          "source": "PubMed",
+          "id": "8524414"
+         },
+         {
+          "evidenceCode": "ECO:0000312",
+          "source": "HGNC",
+          "id": "HGNC:1101"
+         }
+        ],
+        "value": "BRCA2"
+       },
+       "synonyms": [
+        {
+         "value": "FACD"
+        },
+        {
+         "evidences": [
+          {
+           "evidenceCode": "ECO:0000303",
+           "source": "PubMed",
+           "id": "15199141"
+          }
+         ],
+         "value": "FANCD1"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "reactome-server/find_pathways_by_gene": {
+   "gene": "BRCA2",
+   "protein": {
+    "id": "R-HSA-50951",
+    "name": "<span class=\"highlighting\" >BRCA2</span>"
+   },
+   "pathwayCount": 3,
+   "pathways": [
+    {
+     "id": "R-HSA-5693616",
+     "name": [
+      "Presynaptic phase of homologous DNA pairing and strand exchange"
+     ],
+     "url": "https://reactome.org/content/detail/R-HSA-5693616"
+    },
+    {
+     "id": "R-HSA-5685939",
+     "name": [
+      "HDR through MMEJ (alt-NHEJ)"
+     ],
+     "url": "https://reactome.org/content/detail/R-HSA-5685939"
+    },
+    {
+     "id": "R-HSA-912446",
+     "name": [
+      "Meiotic recombination"
+     ],
+     "url": "https://reactome.org/content/detail/R-HSA-912446"
+    }
+   ]
+  },
+  "pdb-server/search_by_uniprot": {
+   "query_id": "bdde639b-6e6e-4d63-a61c-d6808588f769",
+   "result_type": "entry",
+   "total_count": 14,
+   "result_set": [
+    {
+     "identifier": "1N0W",
+     "score": 1
+    },
+    {
+     "identifier": "3EU7",
+     "score": 1
+    },
+    {
+     "identifier": "6GY2",
+     "score": 1
+    }
+   ]
+  },
+  "alphafold-server/get_structure": {
+   "text": "Error fetching AlphaFold structure: Request failed with status code 404"
+  },
+  "chembl-server/search_by_uniprot": {
+   "page_meta": {
+    "limit": 25,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total_count": 0
+   },
+   "targets": []
+  },
+  "pubmed-server/search_articles": {
+   "totalResults": 20921,
+   "returnedResults": 20,
+   "start": 0,
+   "pmids": [
+    "42801248",
+    "42800165",
+    "42799209",
+    "42798422",
+    "42798197",
+    "42797543",
+    "42797409",
+    "42797276",
+    "42797258",
+    "42796612",
+    "42796271",
+    "42794737",
+    "42794654",
+    "42794430",
+    "42792909",
+    "42792721",
+    "42790198",
+    "42788358",
+    "42787995",
+    "42783356"
+   ],
+   "queryTranslation": "(\"breast neoplasms\"[MeSH Terms] OR (\"breast\"[All Fields] AND \"neoplasms\"[All Fields]) OR \"breast neoplasms\"[All Fields] OR (\"breast\"[All Fields] AND \"cancer\"[All Fields]) OR \"breast cancer\"[All Fields]) AND (\"drug delivery systems\"[MeSH Terms] OR (\"drug\"[All Fields] AND \"delivery\"[All Fields] AND \"systems\"[All Fields]) OR \"drug delivery systems\"[All Fields] OR (\"drug\"[All Fields] AND \"target\"[All Fields]) OR \"drug target\"[All Fields]) AND (\"therapeutical\"[All Fields] OR \"therapeutically\"[All Fields] OR \"therapeuticals\"[All Fields] OR \"therapeutics\"[MeSH Terms] OR \"therapeutics\"[All Fields] OR \"therapeutic\"[All Fields])",
+   "articles": [
+    {
+     "pmid": "42801248",
+     "title": "Advances in Drug Delivery Systems for Breast Cancer: From Microenvironment Barriers and Smart Carriers to Clinical Translation Strategies."
+    },
+    {
+     "pmid": "42800165",
+     "title": "Discovery of pyrimidine-based dual CDK2/TrkA inhibitors: Synthesis, antiproliferative activity, and mechanistic insights."
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,92 @@
+{
+  "domain": "omega_hdq_dna_bacteria",
+  "version": "1.0.0",
+  "verify_bijection": false,
+  "mappings": [
+    {
+      "action": "a_pick_up_tip",
+      "server": "liquid-server",
+      "tool": "pick_up_tip"
+    },
+    {
+      "action": "a_return_tip",
+      "server": "liquid-server",
+      "tool": "return_tip"
+    },
+    {
+      "action": "a_aspirate",
+      "server": "liquid-server",
+      "tool": "aspirate"
+    },
+    {
+      "action": "a_dispense",
+      "server": "liquid-server",
+      "tool": "dispense"
+    },
+    {
+      "action": "a_blow_out",
+      "server": "liquid-server",
+      "tool": "blow_out"
+    },
+    {
+      "action": "a_air_gap",
+      "server": "liquid-server",
+      "tool": "air_gap"
+    },
+    {
+      "action": "a_mix",
+      "server": "liquid-server",
+      "tool": "mix"
+    },
+    {
+      "action": "a_set_flow_rate",
+      "server": "liquid-server",
+      "tool": "set_flow_rate"
+    },
+    {
+      "action": "a_home",
+      "server": "liquid-server",
+      "tool": "home"
+    },
+    {
+      "action": "a_hs_set_temperature",
+      "server": "module-server",
+      "tool": "hs_set_temperature"
+    },
+    {
+      "action": "a_hs_set_shake_speed",
+      "server": "module-server",
+      "tool": "hs_set_shake_speed"
+    },
+    {
+      "action": "a_hs_deactivate_shaker",
+      "server": "module-server",
+      "tool": "hs_deactivate_shaker"
+    },
+    {
+      "action": "a_hs_open_latch",
+      "server": "module-server",
+      "tool": "hs_open_latch"
+    },
+    {
+      "action": "a_hs_close_latch",
+      "server": "module-server",
+      "tool": "hs_close_latch"
+    },
+    {
+      "action": "a_temp_set_temperature",
+      "server": "module-server",
+      "tool": "temp_set_temperature"
+    },
+    {
+      "action": "a_delay",
+      "server": "module-server",
+      "tool": "delay"
+    },
+    {
+      "action": "a_move_labware",
+      "server": "gripper-server",
+      "tool": "move_labware"
+    }
+  ]
+}

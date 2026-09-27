@@ -1,0 +1,18 @@
+hplan26-artifact
+Copyright 2026 Eliott Jacopin, Eric Jacopin, Koichi Takahashi
+
+This product includes software from mcp-python-ingestion v0.29.2,
+Copyright 2025 Eric Jacopin, licensed under the Apache License, Version 2.0:
+  - orchestrator/src/hplan_orchestrator/orchestration/  (unmodified)
+  - orchestrator/src/hplan_orchestrator/utils/progress_bar.py  (unmodified)
+  - orchestrator/src/hplan_orchestrator/clients/live.py  (class RealMCPClient, unmodified;
+    module header and helpers added)
+  - orchestrator/tests/test_middleware.py, test_execution_plan.py  (import paths changed)
+  - mappings/*.json, schemas/action_tool_mapping_schema.json  (unmodified)
+  - servers/mcp_servers.json  (server root made configurable)
+
+The planning domains are not included; they are installed from PyPI as part of
+gtpyhop / gtpyhop-examples (The Clear BSD License, Copyright (c) 2021
+University of Maryland).
+
+The eight Augmented Nature MCP servers are not included; see servers/servers.json.

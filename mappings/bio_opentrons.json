@@ -1,0 +1,155 @@
+{
+  "domain": "bio_opentrons",
+  "version": "1.0.0",
+  "verify_bijection": false,
+  "mappings": [
+    {
+      "action": "a_initialize_servers",
+      "server": "movement-server",
+      "tool": "initialize_all"
+    },
+    {
+      "action": "a_load_labware",
+      "server": "movement-server",
+      "tool": "load_labware",
+      "parameter_mapping": {
+        "0": "slot",
+        "1": "labware_type"
+      }
+    },
+    {
+      "action": "a_load_pipette",
+      "server": "movement-server",
+      "tool": "load_pipette",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "pipette_type"
+      }
+    },
+    {
+      "action": "a_pick_up_tip",
+      "server": "movement-server",
+      "tool": "pick_up_tip",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "tiprack_slot"
+      }
+    },
+    {
+      "action": "a_drop_tip",
+      "server": "movement-server",
+      "tool": "drop_tip",
+      "parameter_mapping": {
+        "0": "mount"
+      }
+    },
+    {
+      "action": "a_move_to_well",
+      "server": "movement-server",
+      "tool": "move_to_well",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "labware_slot",
+        "2": "well"
+      }
+    },
+    {
+      "action": "a_aspirate",
+      "server": "liquid-server",
+      "tool": "aspirate",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "volume",
+        "2": "labware_slot",
+        "3": "well"
+      }
+    },
+    {
+      "action": "a_dispense",
+      "server": "liquid-server",
+      "tool": "dispense",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "volume",
+        "2": "labware_slot",
+        "3": "well"
+      }
+    },
+    {
+      "action": "a_mix",
+      "server": "liquid-server",
+      "tool": "mix",
+      "parameter_mapping": {
+        "0": "mount",
+        "1": "repetitions",
+        "2": "volume",
+        "3": "labware_slot",
+        "4": "well"
+      }
+    },
+    {
+      "action": "a_blow_out",
+      "server": "liquid-server",
+      "tool": "blow_out",
+      "parameter_mapping": {
+        "0": "mount"
+      }
+    },
+    {
+      "action": "a_open_thermocycler_lid",
+      "server": "module-server",
+      "tool": "open_thermocycler_lid"
+    },
+    {
+      "action": "a_close_thermocycler_lid",
+      "server": "module-server",
+      "tool": "close_thermocycler_lid"
+    },
+    {
+      "action": "a_set_thermocycler_temperature",
+      "server": "module-server",
+      "tool": "set_block_temperature",
+      "parameter_mapping": {
+        "0": "temperature",
+        "1": "hold_time"
+      }
+    },
+    {
+      "action": "a_execute_thermocycler_profile",
+      "server": "module-server",
+      "tool": "execute_profile",
+      "parameter_mapping": {
+        "0": "profile_name",
+        "1": "num_cycles"
+      }
+    },
+    {
+      "action": "a_deactivate_thermocycler",
+      "server": "module-server",
+      "tool": "deactivate_thermocycler"
+    },
+    {
+      "action": "a_set_temperature_module",
+      "server": "module-server",
+      "tool": "set_temperature",
+      "parameter_mapping": {
+        "0": "temperature"
+      }
+    },
+    {
+      "action": "a_set_heater_shaker",
+      "server": "module-server",
+      "tool": "set_heater_shaker",
+      "parameter_mapping": {
+        "0": "temperature",
+        "1": "speed"
+      }
+    },
+    {
+      "action": "a_deactivate_heater_shaker",
+      "server": "module-server",
+      "tool": "deactivate_heater_shaker"
+    }
+  ]
+}
+
