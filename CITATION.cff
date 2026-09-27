@@ -16,6 +16,8 @@ abstract: >-
   live runs reported in the paper.
 type: software
 license: Apache-2.0
+version: 1.0.0
+date-released: '2026-09-27'
 # NOTE: CFF permits one licence field. The repository is mixed-licence --
 # Apache-2.0 for code, mappings and scripts; CC-BY-4.0 for evidence/.
 # See LICENSES.md, which governs.
