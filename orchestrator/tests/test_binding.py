@@ -9,7 +9,7 @@ import pytest
 from hplan_orchestrator import binding, planning
 from hplan_orchestrator.clients.mock import EchoMCPClient, RecordedBiologyMCPClient
 from hplan_orchestrator.orchestration import ExecutionPlanResponse
-from hplan_orchestrator.runner import run_pipeline, substitution_chain
+from hplan_orchestrator.runner import run_pipeline, status_counts, substitution_chain
 
 MAPPINGS = ["drug_target_discovery", "bio_opentrons", "omega_hdq_dna_bacteria"]
 
@@ -110,7 +110,13 @@ async def test_mock_pipeline_substitution_chain():
     servers = {s for s, _ in PAPER_SEQUENCE} | {"kegg-server"}
     rep = await run_pipeline("drug_target_discovery", "scenario_1_breast_cancer",
                              {s: RecordedBiologyMCPClient(s) for s in servers})
-    assert rep.success and rep.result["steps_completed"] == 8
+    # The recording replays AlphaFold's 404 (isError) and ChEMBL's empty result
+    assert not rep.success
+    assert [s.status for s in rep.steps] == ["success"] * 5 + ["failed", "success, missing outputs", "success"]
+    assert rep.steps[5].error.startswith("Error fetching AlphaFold structure")
+    assert rep.steps[6].output_extractors_missed == ["chembl_target_id", "target_name"]
+    assert status_counts(rep) == {"succeeded": 6, "succeeded with missing outputs": 1,
+                                  "failed": 1, "skipped": 0, "not run": 0}
     chain = substitution_chain(rep)
     assert chain[0] == "disease_id" and chain[-2:] == ["pmids", "article_count"]
     assert chain.index("disease_id") < chain.index("first_gene") < chain.index("uniprot_accession")

@@ -1,6 +1,6 @@
-run_live.py  2026-09-27T14:35:36+00:00  python 3.13.15  gtpyhop 2.0.1  drug_target_discovery/scenario_1_breast_cancer
+run_live.py  2026-09-27T15:13:52+00:00  python 3.13.15  gtpyhop 2.0.1  drug_target_discovery/scenario_1_breast_cancer
 servers root: <SERVERS_ROOT> (8 servers configured)
-connected 8/8 stdio servers in 1.0 s
+connected 8/8 stdio servers in 0.5 s
 
 tools advertised via ListTools (paper, Table 1):
   opentargets-server     6  (paper: 6)
@@ -14,35 +14,34 @@ tools advertised via ListTools (paper, Table 1):
   total                140  (paper: 140)
 
 === run 1/1 (cold: just spawned) ===
-plan_key: plan_20260927_163537_scenario_1_breast_ca   plan length: 8   bound steps: 8   servers_required: alphafold-server, chembl-server, opentargets-server, pdb-server, pubmed-server, reactome-server, uniprot-server
-  #  server             tool                           status          ms
-  1  opentargets-server search_diseases                success        235
+plan_key: plan_20260927_171353_scenario_1_breast_ca   plan length: 8   bound steps: 8   servers_required: alphafold-server, chembl-server, opentargets-server, pdb-server, pubmed-server, reactome-server, uniprot-server
+  #  server             tool                           status                           ms
+  1  opentargets-server search_diseases                success                         225
        query: breast cancer
        => context.disease_id = MONDO_0007254
        => context.disease_name = breast cancer
-  2  opentargets-server get_disease_targets_summary    success        332
+  2  opentargets-server get_disease_targets_summary    success                          22
        diseaseId: ${context.disease_id}  ->  MONDO_0007254
        => context.first_gene = BRCA2
-  3  uniprot-server     search_by_gene                 success        448
+  3  uniprot-server     search_by_gene                 success                         219
        gene: ${context.first_gene}  ->  BRCA2
        => context.uniprot_accession = P51587
        => context.protein_name = Breast cancer type 2 susceptibility protein
-  4  reactome-server    find_pathways_by_gene          success        446
+  4  reactome-server    find_pathways_by_gene          success                         442
        gene: ${context.first_gene}  ->  BRCA2
        => context.first_pathway = R-HSA-5693616
-  5  pdb-server         search_by_uniprot              success        325
+  5  pdb-server         search_by_uniprot              success                         339
        uniprot_id: ${context.uniprot_accession}  ->  P51587
        => context.first_pdb = 1N0W
-  6  alphafold-server   get_structure                  success        117
+  6  alphafold-server   get_structure                  failed                          125
        uniprotId: ${context.uniprot_accession}  ->  P51587
-       (note: tool returned text, not JSON: Error fetching AlphaFold structure: Request failed with status code 404)
-       (no value for: alphafold_model)
-  7  chembl-server      search_by_uniprot              success        128
+       !! Error fetching AlphaFold structure: Request failed with status code 404
+  7  chembl-server      search_by_uniprot              success, missing outputs        159
        uniprot_id: ${context.uniprot_accession}  ->  P51587
-       (no value for: chembl_target_id, target_name)
-  8  pubmed-server      search_articles                success        802
+       ?? no value for: chembl_target_id, target_name
+  8  pubmed-server      search_articles                success                         882
        query: breast cancer drug target therapeutic
        => context.pmids = ['42801248', '42800165', '42799209', '42798422', '42798197', '42797...
        => context.article_count = 20921
-success: True   steps completed: 8/8   wall-clock: 2.8 s
+steps: 6 succeeded, 1 succeeded with missing outputs, 1 failed, 0 skipped (of 8)   all succeeded: False   wall-clock: 2.4 s
 substitution chain: disease_id -> disease_name -> first_gene -> uniprot_accession -> protein_name -> first_pathway -> first_pdb -> pmids -> article_count

@@ -37,7 +37,7 @@ This repository lets a reader reproduce three things:
 | Offline end-to-end run with the substitution chain | `scripts/run_mock.py` | §4 *End-to-end execution* (the chain `disease_id → first_gene → uniprot_accession → … → pmids`) |
 | Live stdio client, server pins, setup scripts | `clients/live.py`, `servers/` | §4 *Setting*; Table 1 |
 | Live run + ListTools tool count | `scripts/run_live.py` | **Table 1** (6 + 26 + 8 + 33 + 5 + 19 + 27 + 16 = 140 tools); **Table 2** (step sequence) |
-| Original log of the paper's three live runs; one re-run | `evidence/` | **Table 2** (35 s / 29 s / 15 s, 8/8 steps) |
+| Original log of the paper's three live runs; one re-run | `evidence/` | **Table 2** (35 s / 29 s / 15 s, 8 steps executed) |
 
 ## Quickstart
 
@@ -46,7 +46,7 @@ Python ≥ 3.10 is required (the `mcp` SDK needs it). We tested with Python 3.13
 ```bash
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[test]"                               # add ",live" for (c)
-pytest                                                 # 81 tests, offline
+pytest                                                 # 91 tests, offline
 ```
 
 ### (a) Planning layer — offline
@@ -80,9 +80,10 @@ For each step, the script prints:
 
 - the server and tool;
 - each argument as a template and as it reached the server (e.g. `diseaseId: ${context.disease_id} -> MONDO_0007254`);
-- the context variables the step's extractors captured.
+- the context variables the step's extractors captured;
+- the step's status (see [Step status](#step-status)), with the error text of a failed step, the reason a step was skipped, and the extractors that found no value.
 
-The drug-target run **replays responses recorded from the live servers** (`orchestrator/src/hplan_orchestrator/data/`). The extractors and the substitution therefore run on real response shapes. The Opentrons domains use an **echo mock**: it exercises planning, binding (named `parameter_mapping` for PCR, positional `arg0…argN` for Omega HDQ) and middleware sequencing, but it simulates no robot.
+The drug-target run **replays responses recorded from the live servers** (`orchestrator/src/hplan_orchestrator/data/`). The extractors and the substitution therefore run on real response shapes. The recording includes AlphaFold's 404 error and ChEMBL's empty result, so this run reports step 6 as failed and step 7 as succeeded with missing outputs, as the live run does. The Opentrons domains use an **echo mock**: it exercises planning, binding (named `parameter_mapping` for PCR, positional `arg0…argN` for Omega HDQ) and middleware sequencing, but it simulates no robot.
 
 ### (c) Live run against the eight Augmented Nature servers
 
@@ -97,38 +98,51 @@ python scripts/run_live.py --servers-root ~/mcp-servers
 - **Setup.** The setup script clones each server at the commit used for the paper (`servers/servers.json`), then runs `npm install && npm run build`.
 - **Servers root.** `run_live.py` takes the root from `--servers-root`. Otherwise it uses `$HPLAN_MCP_SERVERS_ROOT`, and then `~/mcp-servers`.
 - **Startup and tool count.** The script spawns the eight servers as stdio subprocesses. It then prints each server's `ListTools` count next to Table 1.
-- **The run.** It executes the eight-step breast-cancer plan and prints per-step timings and the substitution chain. Use `--runs 3` to replay the same plan on the same subprocesses, as in Table 2.
+- **The run.** It executes the eight-step breast-cancer plan and prints per-step status and timings, a per-status summary and the substitution chain. It exits with status 1 unless every step succeeded. Use `--runs 3` to replay the same plan on the same subprocesses, as in Table 2.
 - **Queries.** A run issues eight read-only queries to public APIs (OpenTargets, UniProt, Reactome, RCSB PDB, AlphaFold DB, ChEMBL, NCBI E-utilities). No keys are needed.
 - **No silent fallback to mocks.** If a server does not start, the script stops and names it.
 
-`evidence/live_run_2026-09-27.log` is such a run: 8/8 steps in 2.8 s, 140 tools. `evidence/README.md` reads it against the paper.
+`evidence/live_run_2026-09-27.log` is such a run: 140 tools; 8 steps executed in 2.4 s, of which 6 succeeded, 1 succeeded with missing outputs (ChEMBL) and 1 failed (AlphaFold, HTTP 404). `evidence/README.md` reads it against the paper.
+
+### Step status
+
+Each step of an orchestrated plan ends in one of four states:
+
+| Status | Meaning |
+|---|---|
+| **success** | The tool returned a result and every output extractor found a value. |
+| **success, missing outputs** | The tool returned a result, but at least one output extractor found no value (`None`, `""`, `[]` or `{}`, e.g. `targets[0]` on an empty list). The variables are listed; they are not put in the context. |
+| **failed** | The call raised or timed out, or the tool reported an error: MCP `isError: true` (set by 7 of the 8 servers; PubMed never sets it) or `success: false`. The server's error text is shown. |
+| **skipped** | The server was not called: an argument needs a `${context.X}` that no earlier step captured, or a declared dependency did not succeed. The missing variables are named. |
+
+The run **continues past a failed or skipped step**: steps that need a missing value are skipped, and independent steps still run (`OrchestrationMiddleware(..., stop_on_failure=True)` restores the original stop-at-first-failure policy). The summary line counts the four states, e.g. `steps: 6 succeeded, 1 succeeded with missing outputs, 1 failed, 0 skipped (of 8)`.
 
 ## What differs from the system in the paper — please read
 
 - **The binding step is re-implemented without the database.** In the paper, `python_execute_plan` ran in a private backend. It read the stored plan and the action→tool mapping edges from a graph database.
   - Here, `binding.py` (a short new module) reads the plan from GTPyhop and the mappings from the JSON files the database was populated from. It emits the same payload, field for field: step numbering, stringified parameters, `parameter_mapping`, `${var}` vs `${context.var}` handling, and `servers_required`.
-  - The middleware that consumes the payload is the original code, unmodified.
+  - The middleware that consumes the payload is the original code, with error-reporting changes only (step status, see [Step status](#step-status) and `NOTICE`). Plan walking, output extraction and `${context.X}` substitution are unchanged.
   - The FastAPI backend, the browser plan controller with Server-Sent Events, and the graph database are **not** included.
 - **The paper's live runs used that backend, with GTPyhop 1.6.0.** The original log records GTPyhop 1.6.0; the paper's *Implementation* paragraph cites v2.0.1, the version this artifact is tested against.
   - This artifact depends on `gtpyhop>=2.0.1,<3`. The test suite passes under both 2.0.1 and 2.0.2, whose five domains are byte-identical.
   - `evidence/live_runs_2025-12-13.log` is the original record. The runs took place on 2025-12-13; the plan they execute was stored on 2025-12-10.
 - **The tool–action correspondence is hand-written.** The three mapping files are hand-written (the paper says so: none of the servers declares an output schema). No ingestion of all 140 tools is involved. The 140 figure is simply what the eight servers advertise via `ListTools`, which `run_live.py` re-counts.
 - **TNF cancer modelling and cross-server pick-and-place are planning-layer only**, as the paper's *Coverage* paragraph states. They have no mapping, so they are exercised by (a) only.
-- **"8/8 steps" means eight tool calls returned.** The middleware does not inspect tool-level error payloads. In the September 2026 re-run, AlphaFold DB has no model for the current top target (BRCA2, P51587) and returns an error text; ChEMBL returns an empty list for it. Neither value is consumed later in the chain. `evidence/README.md` has the details.
+- **The paper's "8/8 steps" means eight steps executed, not eight error-free steps.** The original middleware and live client counted any returned tool result as a completed step; they did not inspect the MCP `isError` flag or check the output extractors. The "8 steps" of the December 2025 log (`Execution completed: 8 steps`) are counted that way. This artifact reports tool errors, extractor misses and skipped steps (see [Step status](#step-status)). In the September 2026 re-run, AlphaFold DB has no model for the current top target (BRCA2, P51587) and returns an error (step 6 failed); ChEMBL returns an empty list for it (step 7 succeeded with missing outputs). Neither value is consumed later in the chain, so no step is skipped. `evidence/README.md` has the details.
 - **The mock differs from the original repository's mock.** The original `MockBiologyMCPClient` returns payloads whose shapes the mapping's extractors do not address, so no `${context.X}` would be substituted. It is replaced here by the recorded-response mock.
 
 ## Repository layout
 
 ```
 orchestrator/src/hplan_orchestrator/
-  orchestration/        middleware.py, execution_plan.py      (from mcp-python-ingestion, unmodified)
+  orchestration/        middleware.py, execution_plan.py      (from mcp-python-ingestion, error reporting added)
   utils/progress_bar.py                                        (from mcp-python-ingestion, unmodified)
   planning.py           load + plan the five gtpyhop-examples domains; expected lengths
   binding.py            plan + mapping JSON -> execution-plan payload; schema validation
   runner.py             plan -> bind -> execute, per-step report
   clients/planner.py    in-process python_find_plan / python_execute_plan
   clients/mock.py       recorded-response mock (drug) and echo mock (Opentrons)
-  clients/live.py       RealMCPClient (stdio, from mcp-python-ingestion) + configurable server root
+  clients/live.py       RealMCPClient (stdio, from mcp-python-ingestion; honours isError) + configurable server root
   data/                 recorded drug-target responses for the mock
 orchestrator/tests/     ported middleware/model tests + planning, binding, consistency tests
 mappings/               drug_target_discovery.json, bio_opentrons.json, omega_hdq_dna_bacteria.json

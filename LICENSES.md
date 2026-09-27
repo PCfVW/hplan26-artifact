@@ -4,7 +4,7 @@ This repository is a research artifact assembled from parts with different prove
 
 | Directory | Contents | Licence | Why |
 |---|---|---|---|
-| `orchestrator/` | the `hplan_orchestrator` package and its tests: the orchestration middleware and execution-plan models (from mcp-python-ingestion v0.29.2, unmodified), the live stdio client (`RealMCPClient`, unmodified), and the new binding glue, planning wrapper, mock clients and runner | **Apache-2.0** (root `LICENSE`) | The copied code is Apache-2.0, © 2025 Éric Jacopin. The new code is original work by the authors, under the same licence. |
+| `orchestrator/` | the `hplan_orchestrator` package and its tests: the orchestration middleware and execution-plan models (from mcp-python-ingestion v0.29.2, with error-reporting changes, see `NOTICE`), the live stdio client (`RealMCPClient`, with error-reporting changes, see `NOTICE`), and the new binding glue, planning wrapper, mock clients and runner | **Apache-2.0** (root `LICENSE`) | The copied code is Apache-2.0, © 2025 Éric Jacopin. The new code is original work by the authors, under the same licence. |
 | `mappings/`, `schemas/` | the three binding-layer mappings and their JSON Schema (from mcp-python-ingestion, unmodified) | **Apache-2.0** (root `LICENSE`) | Same provenance as the middleware. |
 | `scripts/`, `servers/` | the three entry-point scripts; the server launch configuration, pin list and setup scripts | **Apache-2.0** (root `LICENSE`) | Original work by the authors. `servers/` contains **no server code** (see below). |
 | `evidence/` | the original log of the paper's live runs and one re-run | **CC-BY-4.0** (`evidence/LICENSE`) | Research *data*. CC-BY-4.0 is the conventional choice for data and keeps attribution. |

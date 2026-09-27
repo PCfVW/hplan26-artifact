@@ -3,13 +3,40 @@ Copyright 2026 Eliott Jacopin, Éric Jacopin, Koichi Takahashi
 
 This product includes software from mcp-python-ingestion v0.29.2,
 Copyright 2025 Éric Jacopin, licensed under the Apache License, Version 2.0:
-  - orchestrator/src/hplan_orchestrator/orchestration/  (unmodified)
+  - orchestrator/src/hplan_orchestrator/orchestration/  (with error-reporting changes, below)
   - orchestrator/src/hplan_orchestrator/utils/progress_bar.py  (unmodified)
-  - orchestrator/src/hplan_orchestrator/clients/live.py  (class RealMCPClient, unmodified;
-    module header and helpers added)
-  - orchestrator/tests/test_middleware.py, test_execution_plan.py  (import paths changed)
+  - orchestrator/src/hplan_orchestrator/clients/live.py  (class RealMCPClient, with the
+    isError change below; module header and helpers added)
+  - orchestrator/tests/test_middleware.py, test_execution_plan.py  (import paths changed;
+    test_orchestrate_step_failure passes stop_on_failure=True)
   - mappings/*.json, schemas/action_tool_mapping_schema.json  (unmodified)
   - servers/mcp_servers.json  (server root made configurable)
+
+Error-reporting changes, made for this artifact (2026-09-27). The original code
+counted any returned tool result as a successful step:
+  - clients/live.py, RealMCPClient.call_tool: honours the MCP
+    CallToolResult.isError flag; returns "success": False, "isError": True and
+    the server's error text under "error" instead of always "success": True.
+  - orchestration/middleware.py, _execute_step: a result dict (or CallToolResult
+    model) with isError true or success false makes the step FAILED, with the
+    error text.
+  - orchestration/middleware.py, _execute_step: a step whose arguments reference
+    a ${context.X} with no captured value, or that declares a dependency on a
+    step that did not succeed, is SKIPPED and its server is not called (the
+    original sent the literal placeholder text).
+  - orchestration/middleware.py, _orchestrate_plan: an output extractor that
+    resolves to no value (None, "", [] or {}) is recorded in
+    StepResult.missing_outputs instead of being skipped silently; the step
+    stays SUCCESS. Empty values are no longer stored in the context.
+  - orchestration/middleware.py: failure policy. The original stopped at the
+    first failed step; the default is now to continue (dependent steps are
+    SKIPPED, independent steps still run). stop_on_failure=True restores the
+    original policy.
+  - orchestration/middleware.py: the execution record and result add
+    steps_succeeded, steps_succeeded_with_missing_outputs, steps_skipped and
+    steps_not_run; steps_completed and steps_failed keep their meaning. The
+    step-progress callback receives "skipped" for a skipped step.
+  - orchestration/execution_plan.py: StepResult gains missing_outputs.
 
 The planning domains are not included; they are installed from PyPI as part of
 gtpyhop / gtpyhop-examples (The Clear BSD License, Copyright (c) 2021

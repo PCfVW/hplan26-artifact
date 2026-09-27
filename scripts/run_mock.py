@@ -7,6 +7,11 @@
 drug_target_discovery replays the responses recorded from the eight live
 servers, so the ${context.X} chain (disease_id -> first_gene ->
 uniprot_accession -> ... -> pmids) is substituted on realistically shaped data.
+The recording includes AlphaFold's 404 (isError) and ChEMBL's empty result, so
+this run reports step 6 failed and step 7 succeeded with missing outputs, as the
+live run does. Exit status: non-zero if a step of the chain was skipped or not
+run (the expected, recorded failure of step 6 does not count), or if an echo
+run did not succeed on every step.
 bio_opentrons and omega_hdq use an echo mock: they exercise planning, binding
 (parameter_mapping or positional arg0..argN) and middleware sequencing, but
 simulate no robot.
@@ -39,7 +44,8 @@ async def main_async(args) -> int:
     rep = await run_pipeline("drug_target_discovery", "scenario_1_breast_cancer", clients)
     print(format_report(rep))
     print("substitution chain: " + " -> ".join(substitution_chain(rep)))
-    rc |= not rep.success
+    res = rep.result
+    rc |= bool(res.get("steps_skipped") or res.get("steps_not_run"))
 
     if args.all:
         for domain, problem in ECHO_RUNS:

@@ -1,7 +1,10 @@
 """Unit tests for OrchestrationMiddleware.
 
 Ported from mcp-python-ingestion v0.29.2 (tests/orchestration/test_middleware.py).
-Change: import path mcp_python_ingestion.orchestration -> hplan_orchestrator.orchestration.
+Changes: import path mcp_python_ingestion.orchestration -> hplan_orchestrator.orchestration;
+test_orchestrate_step_failure constructs the middleware with stop_on_failure=True
+(the original policy; the default now continues past failures, see NOTICE).
+Tests for the error-reporting changes are in test_error_reporting.py.
 """
 
 import pytest
@@ -236,6 +239,7 @@ class TestOrchestration:
 
         mock_clients["mcp-python-ingestion"].call_tool.return_value = plan_response
         mock_clients["robot-server"].call_tool.side_effect = Exception("Tool failed")
+        middleware = OrchestrationMiddleware(mock_clients, stop_on_failure=True)
 
         result = await middleware.call_tool(
             "mcp-python-ingestion",

@@ -1,9 +1,14 @@
 """Live MCP client: stdio connection to a real MCP server (Node.js subprocess).
 
-``RealMCPClient`` is copied verbatim from mcp-python-ingestion v0.29.2,
+``RealMCPClient`` is copied from mcp-python-ingestion v0.29.2,
 ``examples/orchestration_demo/demo_drug_target_discovery_full_mcp.py``
 (the class the paper's backend imported for its live runs). Only the class was
 extracted; the surrounding demo (graph-database planning, CLI) was not.
+One change for this artifact: ``call_tool`` honours the MCP
+``CallToolResult.isError`` flag. The original always returned
+``"success": True``; it now returns ``"success": False, "isError": True`` and
+the server's error text under ``"error"``, which the middleware reports as a
+FAILED step.
 ``MCPServerError`` is re-declared here as a plain Exception subclass (it
 derived from a demo-specific base class there). ``load_server_config`` is new:
 it replaces the demo's fixed ``~/mcp-servers`` resolution with a configurable
@@ -285,6 +290,20 @@ class RealMCPClient:
                         except (json.JSONDecodeError, TypeError):
                             response_data = {"text": content_item.text}
                         break
+
+            # Honour the MCP tool-level error flag (the server answered, but
+            # the tool failed, e.g. an upstream 404)
+            if getattr(result, "isError", False) is True:
+                error_text = response_data.get("text") if isinstance(response_data, dict) else None
+                return {
+                    "success": False,
+                    "isError": True,
+                    "error": error_text or str(response_data) or "Tool reported an error",
+                    "server": self.server_name,
+                    "tool": name,
+                    "data": response_data,
+                    "arguments": arguments,
+                }
 
             return {
                 "success": True,

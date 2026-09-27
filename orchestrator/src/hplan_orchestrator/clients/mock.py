@@ -3,7 +3,9 @@
 ``RecordedBiologyMCPClient`` replays responses recorded from the eight live
 Augmented Nature servers (``data/drug_target_discovery_recorded.json``) and
 wraps them exactly as ``RealMCPClient.call_tool`` does
-(``{"success", "server", "tool", "data", "arguments"}``), so the binding
+(``{"success", "server", "tool", "data", "arguments"}``, plus
+``"isError": True`` and ``"error"`` for the responses recorded with the MCP
+``isError`` flag set, i.e. AlphaFold's 404), so the binding
 layer's JSON-path output extractors and the middleware's ``${context.X}``
 substitution run on realistically shaped data.
 
@@ -36,7 +38,9 @@ class RecordedBiologyMCPClient:
         self.call_count = 0
         self.tools_called: List[str] = []
         with open(recorded, encoding="utf-8") as f:
-            self._responses: Dict[str, Any] = json.load(f)["responses"]
+            recorded_data = json.load(f)
+        self._responses: Dict[str, Any] = recorded_data["responses"]
+        self._is_error = set(recorded_data.get("is_error", []))
 
     async def call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         if self.delay_ms:
@@ -46,8 +50,12 @@ class RecordedBiologyMCPClient:
             raise KeyError(f"No recorded response for {key}")
         self.call_count += 1
         self.tools_called.append(name)
+        data = json.loads(json.dumps(self._responses[key]))
+        if key in self._is_error:
+            return {"success": False, "isError": True, "error": data.get("text", str(data)),
+                    "server": self.server_name, "tool": name, "data": data, "arguments": arguments}
         return {"success": True, "server": self.server_name, "tool": name,
-                "data": json.loads(json.dumps(self._responses[key])), "arguments": arguments}
+                "data": data, "arguments": arguments}
 
 
 class EchoMCPClient:

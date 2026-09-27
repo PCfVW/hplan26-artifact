@@ -1,5 +1,8 @@
 {
- "_comment": "Recorded responses of the eight-step drug_target_discovery plan (scenario 1, breast cancer), captured with scripts/run_live.py on 2026-09-27 and trimmed to the first few items of each list. Keys are '<server>/<tool>'. Values are the parsed JSON payloads the servers returned, i.e. what RealMCPClient puts under 'data'. The AlphaFold entry is the server's actual error text (AlphaFold DB has no model for P51587) and the ChEMBL entry is its actual empty result.",
+ "_comment": "Recorded responses of the eight-step drug_target_discovery plan (scenario 1, breast cancer), captured with scripts/run_live.py on 2026-09-27 and trimmed to the first few items of each list. Keys are '<server>/<tool>'. Values are the parsed JSON payloads the servers returned, i.e. what RealMCPClient puts under 'data'. The AlphaFold entry is the server's actual error text (AlphaFold DB has no model for P51587) and the ChEMBL entry is its actual empty result. 'is_error' lists the keys whose live CallToolResult had isError: true; the mock replays that flag as RealMCPClient reports it.",
+ "is_error": [
+  "alphafold-server/get_structure"
+ ],
  "responses": {
   "opentargets-server/search_diseases": {
    "data": {

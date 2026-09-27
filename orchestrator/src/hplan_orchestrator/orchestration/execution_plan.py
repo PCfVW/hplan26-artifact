@@ -87,10 +87,14 @@ class StepResult(BaseModel):
     step: int = Field(..., description="Step number that was executed")
     status: ExecutionStatus = Field(..., description="Execution status")
     result: Optional[Dict[str, Any]] = Field(None, description="Result data if successful")
-    error: Optional[str] = Field(None, description="Error message if failed")
+    error: Optional[str] = Field(None, description="Error message if failed, or reason if skipped")
     started_at: datetime = Field(default_factory=_utc_now)
     completed_at: Optional[datetime] = Field(None)
     duration_ms: Optional[float] = Field(None, description="Execution duration in milliseconds")
+    missing_outputs: List[str] = Field(
+        default_factory=list,
+        description="Output extractors (context variable names) whose JSON path resolved to no value"
+    )
 
     model_config = {"frozen": False}
 

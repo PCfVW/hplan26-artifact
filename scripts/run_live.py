@@ -11,6 +11,11 @@ NCBI E-utilities); KEGG is connected, as in the paper, but not called by this
 plan. No API keys are needed. The tool surface (Table 1) is also listed via
 MCP ListTools, which each server answers locally. There is NO silent fallback to mocks: if a
 server cannot be started the script stops and says which one.
+
+Each step is reported as success, success with missing outputs (an output
+extractor found no value), failed (the call raised, or the tool returned
+isError / success: false) or skipped (an argument needs a ${context.X} that no
+earlier step captured). The exit status is 1 unless every step succeeded.
 """
 
 from __future__ import annotations

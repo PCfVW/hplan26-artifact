@@ -8,6 +8,17 @@ Dynamic Data Chaining:
 - Supports output_extractors to extract key data from each step's response
 - Maintains an execution context that accumulates outputs across steps
 - Substitutes ${context.var_name} placeholders with real extracted data
+
+Error reporting (changes made for the hplan26 artifact, see NOTICE):
+- A step whose tool result carries ``isError: true`` or ``success: false`` is
+  FAILED, not SUCCESS (the original counted any returned result as a success).
+- An output extractor whose path resolves to no value (None, "", [] or {})
+  is recorded in ``StepResult.missing_outputs``; the step stays SUCCESS.
+- A step whose arguments reference a ``${context.X}`` with no captured value,
+  or which declares a dependency on a step that did not succeed, is SKIPPED
+  without calling the server.
+- Failure policy: continue past a failed or skipped step (independent steps
+  still run); ``stop_on_failure=True`` restores the original stop-at-first-failure.
 """
 
 from typing import Awaitable, Callable, Dict, List, Any, Optional, Protocol, runtime_checkable, Union
@@ -124,6 +135,50 @@ def substitute_context_variables(
     return re.sub(pattern, replacer, value)
 
 
+def unresolved_context_variables(
+    arguments: Dict[str, Any],
+    context: Dict[str, Any]
+) -> List[str]:
+    """
+    Return the names X of ${context.X} placeholders in string arguments that
+    have no (non-None) value in the execution context.
+    """
+    missing: List[str] = []
+    for value in arguments.values():
+        if isinstance(value, str):
+            for var_name in re.findall(r'\$\{context\.([^}]+)\}', value):
+                if context.get(var_name) is None and var_name not in missing:
+                    missing.append(var_name)
+    return missing
+
+
+def tool_error_message(result: Dict[str, Any]) -> Optional[str]:
+    """
+    Return an error message if a tool result dict reports a tool-level error
+    (``isError: true`` as in MCP CallToolResult, or ``success: false``),
+    else None.
+    """
+    if not isinstance(result, dict):
+        return None
+    if result.get("isError") is not True and result.get("success") is not False:
+        return None
+    if result.get("error"):
+        return str(result["error"])
+    # Fall back to the text the server returned
+    data = result.get("data")
+    if isinstance(data, dict) and isinstance(data.get("text"), str):
+        return data["text"]
+    for item in result.get("content") or []:
+        if isinstance(item, dict) and isinstance(item.get("text"), str):
+            return item["text"]
+    return "Tool reported an error"
+
+
+def _is_empty(value: Any) -> bool:
+    """An extracted value that carries no data: None, "", [] or {}."""
+    return value is None or (isinstance(value, (str, list, dict)) and len(value) == 0)
+
+
 @runtime_checkable
 class MCPClientProtocol(Protocol):
     """Protocol for MCP client interface."""
@@ -158,6 +213,7 @@ class OrchestrationMiddleware:
         auto_orchestrate: bool = True,
         timeout_per_step: float = 30.0,
         enable_progress_bar: bool = True,
+        stop_on_failure: bool = False,
     ):
         """
         Initialize the orchestration middleware.
@@ -167,11 +223,15 @@ class OrchestrationMiddleware:
             auto_orchestrate: If True, automatically orchestrate execution plans.
             timeout_per_step: Timeout in seconds for each step execution.
             enable_progress_bar: If True, display progress bar during execution.
+            stop_on_failure: If True, stop at the first failed step (original
+                behaviour). If False (default), continue: later steps that
+                need a missing value are SKIPPED, independent steps still run.
         """
         self.clients = mcp_clients
         self.auto_orchestrate = auto_orchestrate
         self.timeout_per_step = timeout_per_step
         self.enable_progress_bar = enable_progress_bar
+        self.stop_on_failure = stop_on_failure
         self.execution_history: List[Dict[str, Any]] = []
         self._step_results: Dict[str, List[StepResult]] = {}
 
@@ -319,7 +379,7 @@ class OrchestrationMiddleware:
             # Notify callback that step is complete
             if on_step_progress:
                 try:
-                    status = "success" if result.status == ExecutionStatus.SUCCESS else "failed"
+                    status = result.status.value  # "success", "failed" or "skipped"
                     await on_step_progress(
                         idx, total_steps, action_name, step.server, status,
                         step.arguments, result.result, duration_ms
@@ -336,16 +396,21 @@ class OrchestrationMiddleware:
                 if isinstance(result.result, dict) and 'data' in result.result:
                     extraction_data = result.result['data']
 
-                if step.output_extractors and extraction_data:
-                    for var_name, json_path in step.output_extractors.items():
-                        extracted = extract_json_path(extraction_data, json_path)
-                        if extracted is not None:
-                            execution_context[var_name] = extracted
-                            logger.debug(f"Extracted {var_name}={extracted} from step {step.step}")
+                for var_name, json_path in step.output_extractors.items():
+                    extracted = extract_json_path(extraction_data, json_path)
+                    if not _is_empty(extracted):
+                        execution_context[var_name] = extracted
+                        logger.debug(f"Extracted {var_name}={extracted} from step {step.step}")
+                    else:
+                        # Record the miss instead of skipping it silently
+                        result.missing_outputs.append(var_name)
+                        logger.info(f"Step {step.step}: no value for {var_name} at '{json_path}'")
+            elif result.status == ExecutionStatus.SKIPPED:
+                logger.warning(f"Step {step.step} skipped: {result.error}")
             else:
-                # Stop on failure
                 logger.error(f"Step {step.step} failed: {result.error}")
-                break
+                if self.stop_on_failure:
+                    break
 
         # Print newline after progress bar
         if self.enable_progress_bar:
@@ -358,15 +423,23 @@ class OrchestrationMiddleware:
             "plan_id": plan.plan_id,
             "goal": plan.goal,
             "total_steps": plan.total_steps,
+            # steps_completed = succeeded + succeeded with missing outputs
             "steps_completed": sum(1 for r in step_results if r.status == ExecutionStatus.SUCCESS),
+            "steps_succeeded": sum(1 for r in step_results
+                                   if r.status == ExecutionStatus.SUCCESS and not r.missing_outputs),
+            "steps_succeeded_with_missing_outputs": sum(1 for r in step_results
+                                                        if r.status == ExecutionStatus.SUCCESS and r.missing_outputs),
             "steps_failed": sum(1 for r in step_results if r.status == ExecutionStatus.FAILED),
+            "steps_skipped": sum(1 for r in step_results if r.status == ExecutionStatus.SKIPPED),
+            "steps_not_run": plan.total_steps - len(step_results),
             "step_results": [r.model_dump() for r in step_results],
             "completed_at": datetime.now(timezone.utc).isoformat(),
         }
         self.execution_history.append(execution_record)
 
-        # Determine overall success
-        all_succeeded = all(r.status == ExecutionStatus.SUCCESS for r in step_results)
+        # Determine overall success (a step with missing outputs still counts as succeeded)
+        all_succeeded = (len(step_results) == len(plan.steps)
+                         and all(r.status == ExecutionStatus.SUCCESS for r in step_results))
 
         # Display completion message if progress bar is enabled
         if self.enable_progress_bar:
@@ -385,7 +458,11 @@ class OrchestrationMiddleware:
             "goal": plan.goal,
             "total_steps": plan.total_steps,
             "steps_completed": execution_record["steps_completed"],
+            "steps_succeeded": execution_record["steps_succeeded"],
+            "steps_succeeded_with_missing_outputs": execution_record["steps_succeeded_with_missing_outputs"],
             "steps_failed": execution_record["steps_failed"],
+            "steps_skipped": execution_record["steps_skipped"],
+            "steps_not_run": execution_record["steps_not_run"],
             "step_results": execution_record["step_results"],
             "final_result": step_outputs.get(plan.total_steps) if all_succeeded else None,
         }
@@ -416,6 +493,25 @@ class OrchestrationMiddleware:
                 step=step.step,
                 status=ExecutionStatus.FAILED,
                 error=f"Server '{step.server}' not available",
+                started_at=started_at,
+                completed_at=datetime.now(timezone.utc),
+            )
+
+        # Skip (do not call the server) if a declared dependency did not succeed
+        # or a ${context.X} argument has no captured value: the server would
+        # otherwise receive the literal placeholder text.
+        failed_deps = [d for d in step.dependencies if d not in previous_results]
+        missing_vars = unresolved_context_variables(step.arguments, context)
+        if failed_deps or missing_vars:
+            reasons = []
+            if missing_vars:
+                reasons.append("no value for " + ", ".join(f"${{context.{v}}}" for v in missing_vars))
+            if failed_deps:
+                reasons.append("dependency step(s) " + ", ".join(map(str, failed_deps)) + " did not succeed")
+            return StepResult(
+                step=step.step,
+                status=ExecutionStatus.SKIPPED,
+                error="Skipped: " + "; ".join(reasons),
                 started_at=started_at,
                 completed_at=datetime.now(timezone.utc),
             )
@@ -453,8 +549,10 @@ class OrchestrationMiddleware:
 
             # Convert result to dict if needed
             # MCP CallToolResult has content[0].text with JSON data
+            error_message = None
             if hasattr(result, 'model_dump'):
                 raw_result = result.model_dump()
+                error_message = tool_error_message(raw_result)
                 # Extract the actual data from MCP response structure
                 result_dict = raw_result
                 if 'content' in raw_result and raw_result['content']:
@@ -470,8 +568,22 @@ class OrchestrationMiddleware:
                             pass
             elif isinstance(result, dict):
                 result_dict = result
+                error_message = tool_error_message(result)
             else:
                 result_dict = {"result": result}
+
+            if error_message is not None:
+                # Tool-level error (isError / success: false): the call
+                # returned, but the step did not succeed.
+                return StepResult(
+                    step=step.step,
+                    status=ExecutionStatus.FAILED,
+                    result=result_dict,
+                    error=error_message,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    duration_ms=duration_ms,
+                )
 
             return StepResult(
                 step=step.step,
