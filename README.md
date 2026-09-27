@@ -2,7 +2,7 @@
 
 Artifact for the paper **"HTN Planning as a Coordination Layer for Multi-Server MCP Tool Orchestration"**, Workshop on Hierarchical Planning (HPlan) at ICAPS 2026, Dublin (non-archival).
 
-Eliott Jacopin (RIKEN) · Eric Jacopin (Cosmic AI) · Koichi Takahashi (RIKEN)
+Eliott Jacopin (RIKEN) · Éric Jacopin (Cosmic AI, France) · Koichi Takahashi (RIKEN)
 
 > **Paper:** arXiv link — *TODO*
 > **Archived:** Zenodo DOI — *TODO*

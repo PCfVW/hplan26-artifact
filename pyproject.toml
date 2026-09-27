@@ -10,7 +10,7 @@ readme = "README.md"
 license = { text = "Apache-2.0 (see LICENSES.md)" }
 authors = [
     { name = "Eliott Jacopin", email = "eliott.jacopin@riken.jp" },
-    { name = "Eric Jacopin", email = "eric.jacopin@protonmail.com" },
+    { name = "Éric Jacopin", email = "eric.jacopin@protonmail.com" },
     { name = "Koichi Takahashi", email = "koichi.takahashi@riken.jp" },
 ]
 requires-python = ">=3.10"

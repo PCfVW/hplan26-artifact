@@ -27,8 +27,8 @@ authors:
     email: eliott.jacopin@riken.jp
     # orcid: 'https://orcid.org/TODO'
   - family-names: Jacopin
-    given-names: Eric
-    affiliation: Cosmic AI
+    given-names: Éric
+    affiliation: Cosmic AI, France
     email: eric.jacopin@protonmail.com
     # orcid: 'https://orcid.org/TODO'
   - family-names: Takahashi
@@ -64,8 +64,8 @@ preferred-citation:
       given-names: Eliott
       affiliation: RIKEN
     - family-names: Jacopin
-      given-names: Eric
-      affiliation: Cosmic AI
+      given-names: Éric
+      affiliation: Cosmic AI, France
     - family-names: Takahashi
       given-names: Koichi
       affiliation: RIKEN
