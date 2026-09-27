@@ -5,7 +5,10 @@ Artifact for the paper **"HTN Planning as a Coordination Layer for Multi-Server 
 Eliott Jacopin (RIKEN) · Éric Jacopin (Cosmic AI, France) · Koichi Takahashi (RIKEN)
 
 > **Paper:** arXiv link — *TODO*
-> **Archived:** Zenodo DOI — *TODO*
+> **Archived:** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22999239.svg)](https://doi.org/10.5281/zenodo.22999239)
+>
+> Cite the *concept* DOI `10.5281/zenodo.22999239`, which always resolves to
+> the latest version. Release `v1.0.0` = `10.5281/zenodo.22999240`.
 
 ---
 

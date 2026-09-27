@@ -39,10 +39,9 @@ authors:
     email: koichi.takahashi@riken.jp
     orcid: 'https://orcid.org/0000-0002-4235-9914'
 
-# TODO: Zenodo concept DOI.
 repository-code: 'https://github.com/PCfVW/hplan26-artifact'
 url: 'https://github.com/PCfVW/hplan26-artifact'
-# doi: '10.5281/zenodo.TODO'   # concept DOI: always the latest version
+doi: '10.5281/zenodo.22999239'   # concept DOI: always the latest version
 
 keywords:
   - HTN planning
